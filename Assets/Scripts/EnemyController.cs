@@ -7,6 +7,7 @@ public class EnemyController : MonoBehaviour
     public float health = 30f;
     public Color[] bloodColours;
 
+    private PlayerController player;
     private Rigidbody2D rb;
     private ParticleSystem blood;
     private ParticleSystem.MainModule bloodMain;
@@ -14,6 +15,7 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
+        player = FindObjectOfType<PlayerController>();
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
         blood = GetComponentInChildren<ParticleSystem>();
@@ -75,6 +77,8 @@ public class EnemyController : MonoBehaviour
 
     private void die()
     {
+        player.killCount++;
+
         hasDied = true;
 
         if (!blood.isEmitting)

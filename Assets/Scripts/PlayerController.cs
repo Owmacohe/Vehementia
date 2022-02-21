@@ -1,5 +1,7 @@
+using Febucci.UI;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +12,11 @@ public class PlayerController : MonoBehaviour
     [Range(1, 8)]
     public int jumpHeight = 6;
 
+    public TMP_Text violentMain, violentSecondary, peacefulMain;
+    private GameObject violent, peaceful;
+    public TextAnimator killCountMain;
+    private TextDuplicator killCountDup;
+
     private Rigidbody2D rb;
     private Animator anim;
     private SpriteRenderer rend, weaponRend;
@@ -18,6 +25,10 @@ public class PlayerController : MonoBehaviour
 
     private float direction, moveCount;
     private bool isOnGround, isJumping;
+
+    [HideInInspector]
+    public int killCount;
+    private int lastKillCount;
 
     private void Start()
     {
@@ -29,6 +40,10 @@ public class PlayerController : MonoBehaviour
 
         weapon = GetComponentInChildren<WeaponController>();
         weaponRend = weapon.GetComponentInChildren<SpriteRenderer>();
+
+        violent = violentMain.transform.parent.gameObject;
+        peaceful = peacefulMain.transform.parent.gameObject;
+        killCountDup = killCountMain.gameObject.GetComponent<TextDuplicator>();
     }
 
     private void OnMove(InputValue input)
@@ -51,6 +66,13 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (lastKillCount != killCount)
+        {
+            killCountMain.SetText( "Kill Count: " + "<shake a=" + (killCount / 50f) + ">" + killCount + "</shake>", false);
+            killCountDup.generate();
+            lastKillCount = killCount;
+        }
+
         if (direction == 0 && !isJumping && !weapon.isRotating && !weapon.isMoving)
         {
             if (moveCount > 0)
