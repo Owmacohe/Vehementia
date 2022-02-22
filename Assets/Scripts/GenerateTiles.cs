@@ -24,18 +24,14 @@ public class GenerateTiles : MonoBehaviour
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-
-        for (int i = -10; i < 10; i++)
-        {
-            setColumn(new Vector3Int(i, 0, 0));
-        }
     }
 
     private void FixedUpdate()
     {
-        setColumn(new Vector3Int(
-            (int)player.gameObject.transform.position.x + (tileLoadOffset * (int)player.direction),
-            0, 0));
+        for (int i = -tileLoadOffset; i < tileLoadOffset; i++)
+        {
+            setColumn(new Vector3Int((int)player.gameObject.transform.position.x + i, 0, 0));
+        }
     }
 
     private void setColumn(Vector3Int p)

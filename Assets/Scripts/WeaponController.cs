@@ -10,7 +10,7 @@ public class WeaponController : MonoBehaviour
     public int swingAmount = 15;
 
     public float damage = 10;
-    public float knockback = 5;
+    public float knockback = 10;
 
     [HideInInspector]
     public bool isRotating, isMoving;

@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public float health = 100;
     [Range(0.1f, 3)]
     public float speed = 1.5f;
     [Range(1, 8)]
@@ -31,6 +32,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public int killCount;
     private int lastKillCount;
+
+    private bool pushCooldown;
 
     private void Start()
     {
@@ -118,11 +121,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void hit(float damage, float knockback, int direction)
+    {
+        health -= damage;
+        rb.AddForce(Vector2.right * direction * knockback * 100);
+    }
+
+    private void stopPushCooldown()
+    {
+        pushCooldown = false;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag.Equals("Enemy"))
         {
-            Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+            if (!pushCooldown)
+            {
+                int temp = 1;
+
+                if (collision.transform.position.x > transform.position.x)
+                {
+                    temp = -1;
+                }
+
+                hit(10, 10, temp);
+                pushCooldown = true;
+                Invoke("stopPushCooldown", 2);
+            }
         }
     }
 
