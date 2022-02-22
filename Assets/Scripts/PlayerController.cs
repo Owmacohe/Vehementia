@@ -23,8 +23,10 @@ public class PlayerController : MonoBehaviour
     private ParticleHalo halo;
     private WeaponController weapon;
 
-    private float direction, moveCount;
-    private bool isOnGround, isJumping;
+    [HideInInspector]
+    public float direction, moveCount;
+    [HideInInspector]
+    public bool isOnGround, isJumping;
 
     [HideInInspector]
     public int killCount;
@@ -98,7 +100,7 @@ public class PlayerController : MonoBehaviour
 
             weaponRend.color = Color.white;
 
-            transform.position += Vector3.right * direction * speed * 0.1f;
+            transform.position += Vector3.right * direction * (speed + (moveCount / 100f)) * 0.1f;
 
             if (direction != 0)
             {
