@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public float health = 100;
+    private float lastHealth;
     [Range(0.1f, 3)]
     public float speed = 1.5f;
     [Range(1, 8)]
@@ -15,8 +16,8 @@ public class PlayerController : MonoBehaviour
 
     public TMP_Text violentMain, violentSecondary, peacefulMain;
     private GameObject violent, peaceful;
-    public TextAnimator killCountMain;
-    private TextDuplicator killCountDup;
+    public TextAnimator killCountMain, healthMain;
+    private TextDuplicator killCountDup, healthDup;
 
     private Rigidbody2D rb;
     private Animator anim;
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviour
         violent = violentMain.transform.parent.gameObject;
         peaceful = peacefulMain.transform.parent.gameObject;
         killCountDup = killCountMain.gameObject.GetComponent<TextDuplicator>();
+        healthDup = healthMain.gameObject.GetComponent<TextDuplicator>();
     }
 
     private void OnMove(InputValue input)
@@ -71,6 +73,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (health <= 0)
+        {
+            die();
+        }
+
         if (lastKillCount != killCount)
         {
             killCountMain.SetText( "Kill Count: " + "<shake a=" + (killCount / 50f) + ">" + killCount + "</shake>", false);
@@ -78,11 +85,18 @@ public class PlayerController : MonoBehaviour
             lastKillCount = killCount;
         }
 
+        if (lastHealth != health)
+        {
+            healthMain.SetText("Health: " + "<shake a=" + (1f / (health / 5f)) + ">" + health + "</shake>", false);
+            healthDup.generate();
+            lastHealth = health;
+        }
+
         if (direction == 0 && !isJumping && !weapon.isRotating && !weapon.isMoving)
         {
             if (moveCount > 0)
             {
-                moveCount -= 2;
+                moveCount--;
             }
 
             anim.SetBool("isWalking", false);
@@ -95,6 +109,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            rb.velocity = Vector2.up * rb.velocity.y;
+
             moveCount += 0.2f;
 
             anim.SetBool("isWalking", true);
@@ -124,7 +140,12 @@ public class PlayerController : MonoBehaviour
     public void hit(float damage, float knockback, int direction)
     {
         health -= damage;
-        rb.AddForce(Vector2.right * direction * knockback * 100);
+        rb.AddForce(2 * new Vector2(direction * knockback * 100, 1));
+    }
+
+    public void die()
+    {
+        FindObjectOfType<SceneLoader>().load("Main Scene");
     }
 
     private void stopPushCooldown()
@@ -132,8 +153,15 @@ public class PlayerController : MonoBehaviour
         pushCooldown = false;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
+        if (collision.gameObject.tag.Equals("Ground"))
+        {
+            isOnGround = true;
+            isJumping = false;
+            anim.SetBool("isJumping", isJumping);
+        }
+
         if (collision.gameObject.tag.Equals("Enemy"))
         {
             if (!pushCooldown)
@@ -145,20 +173,10 @@ public class PlayerController : MonoBehaviour
                     temp = -1;
                 }
 
-                hit(10, 10, temp);
+                hit(5, 10, temp);
                 pushCooldown = true;
                 Invoke("stopPushCooldown", 2);
             }
-        }
-    }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag.Equals("Ground"))
-        {
-            isOnGround = true;
-            isJumping = false;
-            anim.SetBool("isJumping", isJumping);
         }
     }
 

@@ -5,7 +5,8 @@ using UnityEngine.Tilemaps;
 
 public class GenerateTiles : MonoBehaviour
 {
-    public int tileLoadOffset = 10;
+    [Range(5, 30)]
+    public int tileLoadOffset = 20;
 
     [Header("Ground")]
     public Tilemap groundTiles;
@@ -20,39 +21,59 @@ public class GenerateTiles : MonoBehaviour
     public Tile bigGrass, middleGrass, smallGrass;
 
     private PlayerController player;
+    private List<int> generated;
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        generated = new List<int>();
     }
 
     private void FixedUpdate()
     {
         for (int i = -tileLoadOffset; i < tileLoadOffset; i++)
         {
-            setColumn(new Vector3Int((int)player.gameObject.transform.position.x + i, 0, 0));
+            int temp = (int)player.gameObject.transform.position.x + i;
+
+            if (!generated.Contains(temp))
+            {
+                setColumn(new Vector3Int(temp, 0, 0));
+            }
         }
     }
 
     private void setColumn(Vector3Int p)
     {
+        int temp1 = Random.Range(0, 5);
+        int heightOffset = Random.Range(2, 5);
+
+        if (temp1 == 0)
+        {
+            checkAndSetTile(wallTiles, p + (heightOffset * Vector3Int.up), defaultSection);
+        }
+
+        float temp2 = Random.Range(0f, 10f);
+
+        if (temp2 <= 9)
+        {
+            checkAndSetTile(wallTiles, p + Vector3Int.up, defaultSection);
+        }
+        else if (temp2 > 9 && temp2 <= 9.5f)
+        {
+            checkAndSetTile(wallTiles, p + Vector3Int.up, middleSection);
+        }
+        else if (temp2 > 9.5f)
+        {
+            checkAndSetTile(wallTiles, p + Vector3Int.up, endSection);
+        }
+
         checkAndSetTile(groundTiles, p, topLayer);
         checkAndSetTile(groundTiles, p - Vector3Int.up, underLayer);
         checkAndSetTile(groundTiles, p - (2 * Vector3Int.up), underLayer);
 
-        float temp = Random.Range(0f, 10f);
-
-        if (temp <= 9)
+        if (!generated.Contains(p.x))
         {
-            checkAndSetTile(wallTiles, p + Vector3Int.up, defaultSection);
-        }
-        else if (temp > 9 && temp <= 9.5f)
-        {
-            checkAndSetTile(wallTiles, p + Vector3Int.up, middleSection);
-        }
-        else if (temp > 9.5f)
-        {
-            checkAndSetTile(wallTiles, p + Vector3Int.up, endSection);
+            generated.Add(p.x);
         }
     }
 

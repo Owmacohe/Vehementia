@@ -8,12 +8,14 @@ public class EnemyController : MonoBehaviour
     public float speed = 7;
     [Range(1, 100)]
     public float health = 30f;
-
     [Range(0, 50)]
     public int jumpRate = 30;
     [Range(0, 1.5f)]
     public float jumpHeight = 0.5f;
+    [Range(10, 50)]
+    public float aggroRange = 30;
 
+    public Color deathColour;
     public Color[] bloodColours;
 
     private PlayerController player;
@@ -51,27 +53,30 @@ public class EnemyController : MonoBehaviour
 
         if (!hasDied)
         {
-            if (!isJumping && Random.Range(0, jumpRate) == 0)
-            {
-                rb.AddForce(Vector2.up * speed * (jumpHeight * 100));
-                isJumping = true;
-            }
-
             transform.rotation = Quaternion.Euler(new Vector3(0, transform.eulerAngles.y, 5 * Mathf.Sin(Time.time * Mathf.PI * 10)));
 
-            float temp = speed / 100f;
-            float speedOffset = Random.Range(0f, temp);
+            if (Vector3.Distance(transform.position, player.transform.position) <= aggroRange)
+            {
+                if (!isJumping && Random.Range(0, jumpRate) == 0)
+                {
+                    rb.AddForce(Vector2.up * speed * (jumpHeight * 100));
+                    isJumping = true;
+                }
 
-            if (transform.position.x > player.transform.position.x + temp)
-            {
-                transform.position -= Vector3.right * (temp + speedOffset);
-                transform.rotation = Quaternion.Euler(new Vector3(0, 180, transform.eulerAngles.z));
-            }
-            else if (transform.position.x < player.transform.position.x - temp)
-            {
-                transform.position += Vector3.right * (temp + speedOffset);
-                transform.rotation = Quaternion.Euler(new Vector3(0, 0, transform.eulerAngles.z));
-            }
+                float temp = speed / 100f;
+                float speedOffset = Random.Range(0f, temp);
+
+                if (transform.position.x > player.transform.position.x + temp)
+                {
+                    transform.position -= Vector3.right * (temp + speedOffset);
+                    transform.rotation = Quaternion.Euler(new Vector3(0, 180, transform.eulerAngles.z));
+                }
+                else if (transform.position.x < player.transform.position.x - temp)
+                {
+                    transform.position += Vector3.right * (temp + speedOffset);
+                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, transform.eulerAngles.z));
+                }
+            } 
         }
     }
 
@@ -84,11 +89,11 @@ public class EnemyController : MonoBehaviour
 
             if (temp > transform.position.x)
             {
-                tempAngle = -45;
+                tempAngle = 135;
             }
             else
             {
-                tempAngle = 135;
+                tempAngle = -45;
             }
 
             var tempShape = blood.shape;
@@ -101,7 +106,7 @@ public class EnemyController : MonoBehaviour
 
             if (!pushCooldown)
             {
-                rb.AddForce(new Vector2(tempAngle / Mathf.Abs(tempAngle), 1f) * (knockback + Random.Range(0f, knockback)) * 100);
+                rb.AddForce(new Vector2(tempAngle / -Mathf.Abs(tempAngle), 0.5f) * (knockback + Random.Range(0f, knockback)) * 100);
                 pushCooldown = true;
             }
 
@@ -131,11 +136,15 @@ public class EnemyController : MonoBehaviour
         var tempShape = blood.shape;
         tempShape.rotation = Vector3.forward * 45;
 
+        GetComponent<SpriteRenderer>().color = deathColour;
+        GetComponent<Animator>().enabled = false;
+
         Invoke("cleanup", 3);
     }
 
     private void cleanup()
     {
+        FindObjectOfType<EnemySpawner>().enemyCount--;
         Destroy(gameObject);
     }
 
