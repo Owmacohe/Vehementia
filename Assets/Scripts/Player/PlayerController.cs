@@ -14,8 +14,6 @@ public class PlayerController : MonoBehaviour
     [Range(1, 8)]
     public int jumpHeight = 6;
 
-    public TMP_Text violentMain, violentSecondary, peacefulMain;
-    private GameObject violent, peaceful;
     public TextAnimator killCountMain, healthMain;
     private TextDuplicator killCountDup, healthDup;
 
@@ -34,7 +32,8 @@ public class PlayerController : MonoBehaviour
     public int killCount;
     private int lastKillCount;
 
-    private bool pushCooldown;
+    private float deathTime;
+    private bool pushCooldown, hasDied;
 
     private void Start()
     {
@@ -47,8 +46,6 @@ public class PlayerController : MonoBehaviour
         weapon = GetComponentInChildren<WeaponController>();
         weaponRend = weapon.GetComponentInChildren<SpriteRenderer>();
 
-        violent = violentMain.transform.parent.gameObject;
-        peaceful = peacefulMain.transform.parent.gameObject;
         killCountDup = killCountMain.gameObject.GetComponent<TextDuplicator>();
         healthDup = healthMain.gameObject.GetComponent<TextDuplicator>();
     }
@@ -73,6 +70,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (hasDied)
+        {
+            // do death animation
+        }
+
         if (health <= 0)
         {
             die();
@@ -145,6 +147,13 @@ public class PlayerController : MonoBehaviour
 
     public void die()
     {
+        /*
+        hasDied = true;
+        
+        Time.timeScale = 0;
+        deathTime = Time.time;
+        */
+
         FindObjectOfType<SceneLoader>().load("Main Scene");
     }
 

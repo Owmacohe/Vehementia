@@ -4,21 +4,31 @@ using UnityEngine;
 
 public class WallController : MonoBehaviour
 {
-    public float speed = 2;
     public Color[] particleColours;
 
     private ParticleSystem part;
     private ParticleSystem.MainModule partMain;
 
+    private PlayerController player;
+
     private void Start()
     {
         part = GetComponentInChildren<ParticleSystem>();
         partMain = part.main;
+
+        player = FindObjectOfType<PlayerController>();
     }
 
     private void FixedUpdate()
     {
-        transform.position += Vector3.right * (speed / 100f);
+        float speed = player.moveCount / 300f;
+
+        if (speed <= 0 || Vector3.Distance(transform.position, player.transform.position) <= 25)
+        {
+            speed = 0.05f;
+        }
+
+        transform.position += Vector3.right * speed;
 
         int temp = Random.Range(0, 11);
         Color tempColour;
@@ -40,6 +50,10 @@ public class WallController : MonoBehaviour
         if (collision.gameObject.tag.Equals("Player"))
         {
             collision.GetComponent<PlayerController>().die();
+        }
+        else if (collision.gameObject.tag.Equals("Enemy"))
+        {
+            collision.GetComponent<EnemyController>().die();
         }
     }
 }

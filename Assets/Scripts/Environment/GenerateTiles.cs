@@ -45,7 +45,7 @@ public class GenerateTiles : MonoBehaviour
     private void setColumn(Vector3Int p)
     {
         int temp1 = Random.Range(0, 5);
-        int heightOffset = Random.Range(2, 5);
+        int heightOffset = Random.Range(2, 7);
 
         if (temp1 == 0)
         {

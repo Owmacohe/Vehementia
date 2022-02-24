@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class MusicController : MonoBehaviour
 {
-    public bool playMusic = true;
+    [Range(10, 40)]
+    public float transitionPoint = 20;
 
     private AudioSource bass, melody;
     private float minimumBass;
@@ -12,62 +13,56 @@ public class MusicController : MonoBehaviour
 
     private void Start()
     {
-        if (playMusic)
-        {
-            AudioSource[] temp = GetComponents<AudioSource>();
+        AudioSource[] temp = GetComponents<AudioSource>();
 
-            bass = temp[0];
-            minimumBass = bass.volume;
-            bass.Play();
+        bass = temp[0];
+        minimumBass = bass.volume;
+        bass.Play();
 
-            melody = temp[1];
+        melody = temp[1];
 
-            player = FindObjectOfType<PlayerController>();
-        }
+        player = FindObjectOfType<PlayerController>();
     }
 
     private void FixedUpdate()
     {
-        if (playMusic)
+        float temp = player.moveCount;
+
+        if (temp < transitionPoint)
         {
-            float temp = player.moveCount;
-
-            if (temp < 15)
+            if (bass.isPlaying)
             {
-                if (bass.isPlaying)
-                {
-                    bass.volume = (temp / 30f) + minimumBass;
-                }
+                bass.volume = (temp / 30f) + minimumBass;
+            }
 
-                if (melody.isPlaying && melody.volume == 0)
-                {
-                    melody.Stop();
-                    bass.Play();
-                }
-                else
-                {
-                    melody.volume -= 0.005f;
-                }
+            if (melody.isPlaying && melody.volume == 0)
+            {
+                melody.Stop();
+                bass.Play();
             }
             else
             {
-                if (bass.isPlaying && bass.volume == 0)
-                {
-                    bass.Stop();
-                }
-                else
-                {
-                    bass.volume -= 0.01f;
-                }
+                melody.volume -= 0.005f;
+            }
+        }
+        else
+        {
+            if (bass.isPlaying && bass.volume == 0)
+            {
+                bass.Stop();
+            }
+            else
+            {
+                bass.volume -= 0.01f;
+            }
 
-                if (!melody.isPlaying)
-                {
-                    melody.Play();
-                }
-                else
-                {
-                    melody.volume = (temp / 100f);
-                }
+            if (!melody.isPlaying)
+            {
+                melody.Play();
+            }
+            else
+            {
+                melody.volume = (temp / 100f);
             }
         }
     }
