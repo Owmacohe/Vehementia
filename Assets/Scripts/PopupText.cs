@@ -38,25 +38,65 @@ public class PopupText : MonoBehaviour
         if (temp == 10)
         {
             main = "10 unholy beasts slaughtered!";
-            secondary = "A taste of blood";
+            secondary = "Truth of suffering acknowledged";
         }
         else if (temp == 30)
         {
-            print(30);
-            main = "30 glorious monster deaths!";
-            secondary = "Rising prowess";
+            main = "30 fell creatures returned to dust!";
+            secondary = "Cause of suffering revealed";
         }
-        else if (temp == 50)
+        else if (temp == 60)
         {
-            print(50);
-            main = "50 unspeakable horrors banished!";
-            secondary = "Master of carnage";
+            main = "60 abhorrent monsters crushed!";
+            secondary = "End to suffering in sight";
+        }
+        else if (temp == 100)
+        {
+            main = "100 wretched beings eviscerated!";
+            secondary = "Path from suffering found";
         }
 
         if (!main.Equals(""))
         {
             tryShowViolent(temp, main, secondary);
         }
+
+        /*
+        // Prologue
+        showPeaceful(
+            "Let us speak now of hatred and suffering. " +
+            "The dark whisperings that spring forth in idle minds, and take hold. " +
+            "Send them back, howling from whence they came! Call forth your vehemence, and stain your soul. " +
+            "In time you will wash them all away to amnesia."
+        );
+
+        // When entering the sanctuary
+        showPeaceful(
+            "Breathe deep, small one. You are safe. You are warm. " +
+            "The beasts cannot harm you here. Sit, sleep, and let forgetfulness take you."
+        );
+
+
+        // When healing
+        showPeaceful(
+            "Wash the blood from your wounds, and the pain from your mind. " +
+            "Let your sins flow away to afterthought."
+        );
+
+
+        // When buying / equipping items
+        showPeaceful(
+            "My gift of sleep and your gift of death are not so different. " +
+            "Choose wisely, and bring swift justice to those horrid beasts."
+        );
+
+
+        // When exiting the sanctuary
+        showPeaceful(
+            "Be well, small one. Dark horrors await you beyond my reach. " +
+            "As always, I will await your end."
+        );
+        */
     }
 
     private void tryShowViolent(int kills, string main, string secondary)

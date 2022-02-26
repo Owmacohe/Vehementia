@@ -150,8 +150,12 @@ public class PlayerController : MonoBehaviour
         /*
         hasDied = true;
         
+        // only freeze required objects
         Time.timeScale = 0;
         deathTime = Time.time;
+
+        healthMain.SetText("Health: " + "<shake a=0.3>DEATH</shake>", false);
+        healthDup.generate();
         */
 
         FindObjectOfType<SceneLoader>().load("Main Scene");
@@ -182,7 +186,7 @@ public class PlayerController : MonoBehaviour
                     temp = -1;
                 }
 
-                hit(5, 10, temp);
+                hit(10, 10, temp);
                 pushCooldown = true;
                 Invoke("stopPushCooldown", 2);
             }

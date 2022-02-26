@@ -452,8 +452,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281155879
-  m_fontColor: {r: 0.15294118, g: 0.25490198, b: 0.1764706, a: 1}
+    rgba: 4281243327
+  m_fontColor: {r: 0.7490196, g: 0.5882353, b: 0.18039216, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -524,7 +524,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1794f3ae638453a4c83792c8c0cb4a3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textColour: {r: 0.5921569, g: 0.9294118, b: 0.79215693, a: 1}
+  textColour: {r: 0.972549, g: 0.77254903, b: 0.22745098, a: 1}
   offset: {x: 2, y: 0}
 --- !u!114 &3579882467689869082
 MonoBehaviour:
@@ -6526,8 +6526,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   swingSpeed: 20
   swingAmount: 15
-  damage: 10
-  knockback: 20
+  damage: 15
+  knockback: 25
   isRotating: 0
   isMoving: 0
 --- !u!61 &2624344533953433475
