@@ -21,39 +21,46 @@ public class WallController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float speed = player.moveCount / 300f;
-
-        if (speed <= 0 || Vector3.Distance(transform.position, player.transform.position) <= 25)
+        if (!player.hasDied)
         {
-            speed = 0.05f;
-        }
+            float speed = player.moveCount / 300f;
 
-        transform.position += Vector3.right * speed;
+            if (speed <= 0 || Vector3.Distance(transform.position, player.transform.position) <= 25)
+            {
+                speed = 0.05f;
+            }
 
-        int temp = Random.Range(0, 11);
-        Color tempColour;
+            transform.position += Vector3.right * speed;
 
-        if (temp <= 8)
-        {
-            tempColour = particleColours[0];
+            int temp = Random.Range(0, 11);
+            Color tempColour;
+
+            if (temp <= 8)
+            {
+                tempColour = particleColours[0];
+            }
+            else
+            {
+                tempColour = particleColours[Random.Range(1, particleColours.Length)];
+            }
+
+            partMain.startColor = new ParticleSystem.MinMaxGradient(tempColour);
         }
         else
         {
-            tempColour = particleColours[Random.Range(1, particleColours.Length)];
+            part.Pause();
         }
-
-        partMain.startColor = new ParticleSystem.MinMaxGradient(tempColour);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag.Equals("Player"))
         {
-            collision.GetComponent<PlayerController>().die();
+            collision.gameObject.GetComponent<PlayerController>().die();
         }
         else if (collision.gameObject.tag.Equals("Enemy"))
         {
-            collision.GetComponent<EnemyController>().die();
+            collision.gameObject.GetComponent<EnemyController>().die();
         }
     }
 }

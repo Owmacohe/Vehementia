@@ -8,7 +8,19 @@ Let the anger consume you! Let its ichor flow through your veins! Subsume to rag
 
 
 
+---
+
+
+
 ## Combat popups
+
+### Inspiration
+
+- [Doom Eternal Dark Lord](https://www.youtube.com/watch?v=Fg79cscI04I)
+- [The Mouth of Sauron](https://youtu.be/8FfRRpRAHI0?t=62)
+- Dragon Voice, if you’d like
+
+### Lines
 
 **10 unholy beasts slaughtered!**
 --- Truth of suffering acknowledged ---
@@ -22,9 +34,23 @@ Let the anger consume you! Let its ichor flow through your veins! Subsume to rag
 **100 wretched beings eviscerated!**
 --- Path from suffering found ---
 
+*(also any general squeals, growls, or unholy sounds you want to make for the monsters, a la Doom)*
+
+
+
+---
+
 
 
 ## Sanctuary popups
+
+### Inspiration
+
+- [Bloodborne Doll](https://www.youtube.com/watch?v=AucX8PHJNt0)
+- [Hollow Knight White Lady](https://youtu.be/4lRSwbILKTA?t=54)
+- [Galadriel](https://www.youtube.com/watch?v=W0znpBHTmFw)
+
+### Lines
 
 ***Prologue***
 Let us speak now of hatred and suffering. The dark whisperings that spring forth in idle minds, and take hold. Send them back, howling from whence they came! Call forth your vehemence, and stain your soul. In time you will wash them all away to amnesia.

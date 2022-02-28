@@ -17,31 +17,40 @@ public class PlayerController : MonoBehaviour
     public TextAnimator killCountMain, healthMain;
     private TextDuplicator killCountDup, healthDup;
 
+    public SpriteRenderer fade;
+
     private Rigidbody2D rb;
     private Animator anim;
     private SpriteRenderer rend, weaponRend;
     private ParticleHalo halo;
     private WeaponController weapon;
+    private Camera playerCamera;
 
     [HideInInspector]
     public float direction, moveCount;
     [HideInInspector]
-    public bool isOnGround, isJumping;
+    public bool isOnGround, isJumping, hasDied;
 
     [HideInInspector]
     public int killCount;
     private int lastKillCount;
 
     private float deathTime;
-    private bool pushCooldown, hasDied;
+    private bool pushCooldown, hasLeftSanctuary;
 
     private void Start()
     {
+        if (FindObjectOfType<SceneLoader>() == null)
+        {
+            Instantiate(Resources.Load("Scene Manager"), Vector2.zero, Quaternion.identity);
+        }
+
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
         anim = GetComponent<Animator>();
         rend = GetComponent<SpriteRenderer>();
         halo = GetComponent<ParticleHalo>();
+        playerCamera = Camera.main;
 
         weapon = GetComponentInChildren<WeaponController>();
         weaponRend = weapon.GetComponentInChildren<SpriteRenderer>();
@@ -57,7 +66,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputValue input)
     {
-        if (isOnGround)
+        if (!hasDied && isOnGround)
         {
             rb.velocity += Vector2.up * jumpHeight;
         }
@@ -70,14 +79,25 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (hasDied)
+        if (transform.position.x < -12)
         {
-            // do death animation
+            playerCamera.enabled = false;
+            killCountDup.transform.parent.gameObject.SetActive(false);
+            healthDup.transform.parent.gameObject.SetActive(false);
         }
-
-        if (health <= 0)
+        else
         {
-            die();
+            playerCamera.enabled = true;
+            killCountDup.transform.parent.gameObject.SetActive(true);
+            healthDup.transform.parent.gameObject.SetActive(true);
+
+            if (!hasLeftSanctuary && transform.position.x >= 20)
+            {
+                hasLeftSanctuary = true;
+
+                Instantiate(Resources.Load("Wall Of Death"), Vector3.zero, Quaternion.identity);
+                GetComponent<EnemySpawner>().enabled = true;
+            }
         }
 
         if (lastKillCount != killCount)
@@ -94,46 +114,73 @@ public class PlayerController : MonoBehaviour
             lastHealth = health;
         }
 
-        if (direction == 0 && !isJumping && !weapon.isRotating && !weapon.isMoving)
+        if (hasDied)
         {
+            fade.color = new Color(0, 0, 0, Time.time - deathTime);
+
+            if (Time.time - deathTime >= 3)
+            {
+                SceneLoader loader = FindObjectOfType<SceneLoader>();
+                loader.hasAlreadyPlayed = true;
+                loader.load("Main Scene");
+            }
+
             if (moveCount > 0)
             {
                 moveCount--;
             }
-
-            anim.SetBool("isWalking", false);
-            Color temp = new Color(1, 1, 1, 0.2f * Mathf.Sin(0.5f * Time.time * Mathf.PI) + 0.5f);
-            rend.color = temp;
-            halo.setIdle();
-
-            weapon.gameObject.transform.localRotation = Quaternion.Euler(Vector3.forward * 30);
-            weaponRend.color = temp;
         }
         else
         {
-            rb.velocity = Vector2.up * rb.velocity.y;
-
-            moveCount += 0.2f;
-
-            anim.SetBool("isWalking", true);
-            rend.color = Color.white;
-            halo.setWalking(moveCount);
-
-            weaponRend.color = Color.white;
-
-            transform.position += Vector3.right * direction * (speed + (moveCount / 100f)) * 0.1f;
-
-            if (direction != 0)
+            if (health <= 0)
             {
-                if (direction > 0)
+                die();
+            }
+
+            if (direction == 0 && !isJumping && !weapon.isRotating && !weapon.isMoving)
+            {
+                if (moveCount > 0)
                 {
-                    transform.rotation = Quaternion.identity;
-                    Camera.main.transform.localRotation = Quaternion.identity;
+                    moveCount--;
                 }
-                else
+
+                anim.SetBool("isWalking", false);
+                Color temp = new Color(1, 1, 1, 0.2f * Mathf.Sin(0.5f * Time.time * Mathf.PI) + 0.5f);
+                rend.color = temp;
+                halo.setIdle();
+
+                weapon.gameObject.transform.localRotation = Quaternion.Euler(Vector3.forward * 30);
+                weaponRend.color = temp;
+            }
+            else
+            {
+                rb.velocity = Vector2.up * rb.velocity.y;
+
+                if (transform.position.x >= 0)
                 {
-                    transform.rotation = Quaternion.Euler(Vector3.up * 180);
-                    Camera.main.transform.localRotation = Quaternion.Euler(Vector3.up * 180);
+                    moveCount += 0.2f;
+                }
+
+                anim.SetBool("isWalking", true);
+                rend.color = Color.white;
+                halo.setWalking(moveCount);
+
+                weaponRend.color = Color.white;
+
+                transform.position += Vector3.right * direction * (speed + (moveCount / 100f)) * 0.1f;
+
+                if (direction != 0)
+                {
+                    if (direction > 0)
+                    {
+                        transform.rotation = Quaternion.identity;
+                        playerCamera.transform.localRotation = Quaternion.identity;
+                    }
+                    else
+                    {
+                        transform.rotation = Quaternion.Euler(Vector3.up * 180);
+                        playerCamera.transform.localRotation = Quaternion.Euler(Vector3.up * 180);
+                    }
                 }
             }
         }
@@ -147,18 +194,19 @@ public class PlayerController : MonoBehaviour
 
     public void die()
     {
-        /*
-        hasDied = true;
-        
-        // only freeze required objects
-        Time.timeScale = 0;
-        deathTime = Time.time;
+        if (!hasDied)
+        {
+            hasDied = true;
 
-        healthMain.SetText("Health: " + "<shake a=0.3>DEATH</shake>", false);
-        healthDup.generate();
-        */
+            anim.SetBool("isJumping", true);
+            rend.color = Color.white;
+            halo.setWalking(moveCount);
 
-        FindObjectOfType<SceneLoader>().load("Main Scene");
+            deathTime = Time.time;
+
+            healthMain.SetText("Health: " + "<shake a=0.3>DEAD</shake>", false);
+            healthDup.generate();
+        }
     }
 
     private void stopPushCooldown()
@@ -168,34 +216,37 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.tag.Equals("Ground"))
+        if (!hasDied)
         {
-            isOnGround = true;
-            isJumping = false;
-            anim.SetBool("isJumping", isJumping);
-        }
-
-        if (collision.gameObject.tag.Equals("Enemy"))
-        {
-            if (!pushCooldown)
+            if (collision.gameObject.tag.Equals("Ground"))
             {
-                int temp = 1;
+                isOnGround = true;
+                isJumping = false;
+                anim.SetBool("isJumping", isJumping);
+            }
 
-                if (collision.transform.position.x > transform.position.x)
+            if (collision.gameObject.tag.Equals("Enemy"))
+            {
+                if (!pushCooldown)
                 {
-                    temp = -1;
-                }
+                    int temp = 1;
 
-                hit(10, 10, temp);
-                pushCooldown = true;
-                Invoke("stopPushCooldown", 2);
+                    if (collision.transform.position.x > transform.position.x)
+                    {
+                        temp = -1;
+                    }
+
+                    hit(10, 10, temp);
+                    pushCooldown = true;
+                    Invoke("stopPushCooldown", 2);
+                }
             }
         }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.tag.Equals("Ground"))
+        if (!hasDied && collision.gameObject.tag.Equals("Ground"))
         {
             isOnGround = false;
             isJumping = true;

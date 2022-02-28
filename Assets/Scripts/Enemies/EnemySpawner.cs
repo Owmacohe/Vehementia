@@ -11,14 +11,17 @@ public class EnemySpawner : MonoBehaviour
     public int enemyCount;
     private GameObject[] enemies;
 
+    private PlayerController controller;
+
     private void Start()
     {
         enemies = Resources.LoadAll<GameObject>("Enemies");
+        controller = GetComponent<PlayerController>();
     }
 
     private void FixedUpdate()
     {
-        if (enemyCount < spawnCap)
+        if (!controller.hasDied && enemyCount < spawnCap)
         {
             int temp = Random.Range(0, 50);
 

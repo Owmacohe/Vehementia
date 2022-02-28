@@ -51,7 +51,7 @@ public class EnemyController : MonoBehaviour
             bloodMain.startColor = new ParticleSystem.MinMaxGradient(bloodColours[Random.Range(0, bloodColours.Length)]);
         }
 
-        if (!hasDied)
+        if (!player.hasDied && !hasDied)
         {
             transform.rotation = Quaternion.Euler(new Vector3(0, transform.eulerAngles.y, 5 * Mathf.Sin(Time.time * Mathf.PI * 10)));
 

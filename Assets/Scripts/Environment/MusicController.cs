@@ -17,6 +17,7 @@ public class MusicController : MonoBehaviour
 
         bass = temp[0];
         minimumBass = bass.volume;
+        bass.volume = 0;
         bass.Play();
 
         melody = temp[1];
@@ -24,15 +25,23 @@ public class MusicController : MonoBehaviour
         player = FindObjectOfType<PlayerController>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         float temp = player.moveCount;
+        float pos = player.transform.position.x;
 
         if (temp < transitionPoint)
         {
             if (bass.isPlaying)
             {
-                bass.volume = (temp / 30f) + minimumBass;
+                if (temp <= 0 && pos < 0)
+                {
+                    bass.volume = 0;
+                }
+                else
+                {
+                    bass.volume = (temp / 30f) + minimumBass;
+                }
             }
 
             if (melody.isPlaying && melody.volume == 0)
@@ -62,7 +71,14 @@ public class MusicController : MonoBehaviour
             }
             else
             {
-                melody.volume = (temp / 100f);
+                if (temp <= 0 && pos < 0)
+                {
+                    melody.volume = 0;
+                }
+                else
+                {
+                    melody.volume = (temp / 100f);
+                }
             }
         }
     }

@@ -5,6 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
+    [HideInInspector]
+    public bool hasAlreadyPlayed;
+
+    private void Start()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
+
     public void load(string name)
     {
         SceneManager.LoadSceneAsync(name);

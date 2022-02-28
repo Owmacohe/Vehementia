@@ -18,7 +18,7 @@ public class GenerateTiles : MonoBehaviour
 
     [Header("Grass")]
     public Tilemap grassTiles;
-    public Tile bigGrass, middleGrass, smallGrass;
+    public Tile[] grass;
 
     private PlayerController player;
     private List<int> generated;
@@ -31,6 +31,11 @@ public class GenerateTiles : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (player.hasDied)
+        {
+            grassTiles.GetComponent<TilemapRenderer>().sortingOrder = 4;
+        }
+
         for (int i = -tileLoadOffset; i < tileLoadOffset; i++)
         {
             int temp = (int)player.gameObject.transform.position.x + i;
@@ -44,36 +49,46 @@ public class GenerateTiles : MonoBehaviour
 
     private void setColumn(Vector3Int p)
     {
-        int temp1 = Random.Range(0, 5);
-        int heightOffset = Random.Range(2, 7);
-
-        if (temp1 == 0)
+        if (p.x >= 0)
         {
-            checkAndSetTile(wallTiles, p + (heightOffset * Vector3Int.up), defaultSection);
-        }
+            int temp1 = Random.Range(0, 5);
+            int heightOffset = Random.Range(2, 7);
 
-        float temp2 = Random.Range(0f, 10f);
+            if (temp1 == 0)
+            {
+                checkAndSetTile(wallTiles, p + (heightOffset * Vector3Int.up), defaultSection);
+            }
 
-        if (temp2 <= 9)
-        {
-            checkAndSetTile(wallTiles, p + Vector3Int.up, defaultSection);
-        }
-        else if (temp2 > 9 && temp2 <= 9.5f)
-        {
-            checkAndSetTile(wallTiles, p + Vector3Int.up, middleSection);
-        }
-        else if (temp2 > 9.5f)
-        {
-            checkAndSetTile(wallTiles, p + Vector3Int.up, endSection);
-        }
+            int temp2 = Random.Range(0, 5);
 
-        checkAndSetTile(groundTiles, p, topLayer);
-        checkAndSetTile(groundTiles, p - Vector3Int.up, underLayer);
-        checkAndSetTile(groundTiles, p - (2 * Vector3Int.up), underLayer);
+            if (temp2 == 0)
+            {
+                checkAndSetTile(grassTiles, p + Vector3Int.up, grass[Random.Range(0, grass.Length)]);
+            }
 
-        if (!generated.Contains(p.x))
-        {
-            generated.Add(p.x);
+            float temp3 = Random.Range(0f, 10f);
+
+            if (temp3 <= 9)
+            {
+                checkAndSetTile(wallTiles, p + Vector3Int.up, defaultSection);
+            }
+            else if (temp3 > 9 && temp3 <= 9.5f)
+            {
+                checkAndSetTile(wallTiles, p + Vector3Int.up, middleSection);
+            }
+            else if (temp3 > 9.5f)
+            {
+                checkAndSetTile(wallTiles, p + Vector3Int.up, endSection);
+            }
+
+            checkAndSetTile(groundTiles, p, topLayer);
+            checkAndSetTile(groundTiles, p - Vector3Int.up, underLayer);
+            checkAndSetTile(groundTiles, p - (2 * Vector3Int.up), underLayer);
+
+            if (!generated.Contains(p.x))
+            {
+                generated.Add(p.x);
+            }
         }
     }
 
