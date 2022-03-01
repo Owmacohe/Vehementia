@@ -167,7 +167,7 @@ public class PlayerController : MonoBehaviour
 
                 weaponRend.color = Color.white;
 
-                transform.position += Vector3.right * direction * (speed + (moveCount / 100f)) * 0.1f;
+                transform.position += Vector3.right * direction * speed * 0.1f;
 
                 if (direction != 0)
                 {

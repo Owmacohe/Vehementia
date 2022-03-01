@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [Range(0, 12)]
-    public float speed = 7;
+    public float speed = 8;
     [Range(1, 100)]
     public float health = 30f;
     [Range(0, 50)]
@@ -18,10 +18,15 @@ public class EnemyController : MonoBehaviour
     public Color deathColour;
     public Color[] bloodColours;
 
+    public AudioClip[] defaultSounds;
+    public AudioClip[] specialSounds;
+
     private PlayerController player;
     private Rigidbody2D rb;
     private ParticleSystem blood;
     private ParticleSystem.MainModule bloodMain;
+    private AudioSource audio;
+
     private bool pushCooldown, hasDied, isJumping;
 
     private void Start()
@@ -31,6 +36,7 @@ public class EnemyController : MonoBehaviour
         rb.freezeRotation = true;
         blood = GetComponentInChildren<ParticleSystem>();
         bloodMain = blood.main;
+        audio = GetComponent<AudioSource>();
     }
 
     private void FixedUpdate()
@@ -111,6 +117,24 @@ public class EnemyController : MonoBehaviour
             }
 
             isJumping = true;
+
+            int soundChance = Random.Range(0, 1);
+
+            if (soundChance == 0)
+            {
+                int specialChance = Random.Range(0, 6);
+
+                if (specialChance == 0)
+                {
+                    audio.clip = specialSounds[Random.Range(0, specialSounds.Length)];
+                }
+                else
+                {
+                    audio.clip = defaultSounds[Random.Range(0, defaultSounds.Length)];
+                }
+
+                audio.Play();
+            }
         }
     }
 

@@ -6,7 +6,15 @@ using UnityEngine;
 
 public class PopupText : MonoBehaviour
 {
-    public GameObject violent, peaceful;
+    [Header("Violent")]
+    public GameObject violent;
+    public AudioClip combatPopup10, combatPopup30, combatPopup60, combatPopup100;
+
+    [Header("Peaceful")]
+    public GameObject peaceful;
+    public AudioClip prologuePopup, sanctuaryPopup, healingPopup, buyingPopup, exitingPopup;
+
+    private AudioSource audio;
 
     private TextAnimator violentMain;
     private TMP_Text violentSecondary, peacefulMain;
@@ -19,11 +27,15 @@ public class PopupText : MonoBehaviour
 
     private enum PeacefulLines { None, Prologue, Sanctuary, Healing, Buying, Exiting };
 
-    private PeacefulLines currentLine;
+    private PeacefulLines currentPeacefulLine;
     private bool hasLeftSanctuary = false;
+
+    private int currentViolentLine;
 
     private void Start()
     {
+        audio = GetComponent<AudioSource>();
+
         violentMain = violent.GetComponentsInChildren<TextAnimator>()[0];
         violentSecondary = violent.GetComponentsInChildren<TMP_Text>()[1];
         peacefulMain = peaceful.GetComponentInChildren<TMP_Text>();
@@ -58,24 +70,22 @@ public class PopupText : MonoBehaviour
 
         if (pos >= 0)
         {
-            hasLeftSanctuary = true;
-            hidePeaceful();
-
-            if (!hasLeftSanctuary && !currentLine.Equals(PeacefulLines.Exiting))
+            if (!hasLeftSanctuary)
             {
-                showPeaceful(PeacefulLines.Exiting);
+                hasLeftSanctuary = true;
+                hidePeaceful();
             }
         }
         else if (pos >= -13 && pos < 0)
         {
-            if (!hasLeftSanctuary && !currentLine.Equals(PeacefulLines.Exiting))
+            if (!hasLeftSanctuary && !currentPeacefulLine.Equals(PeacefulLines.Exiting))
             {
                 showPeaceful(PeacefulLines.Exiting);
             }
         }
         else
         {
-            if (hasLeftSanctuary && !currentLine.Equals(PeacefulLines.Sanctuary))
+            if (hasLeftSanctuary && !currentPeacefulLine.Equals(PeacefulLines.Sanctuary))
             {
                 showPeaceful(PeacefulLines.Sanctuary);
             }
@@ -86,7 +96,11 @@ public class PopupText : MonoBehaviour
 
     private void tryShowViolent(int kills)
     {
-        if (!popups.Contains(kills) && (kills == 10 || kills == 30 || kills == 60 || kills == 100))
+        if (!popups.Contains(kills) && (
+            (kills >= 10 && kills < 30 && currentViolentLine < 10) ||
+            (kills >= 30 && kills < 60 && currentViolentLine < 30) ||
+            (kills >= 60 && kills < 100 && currentViolentLine < 60) ||
+            (kills >= 100 && currentViolentLine < 100)))
         {
             showViolent(kills);
             popups.Add(kills);
@@ -97,26 +111,35 @@ public class PopupText : MonoBehaviour
     {
         string main = "";
         string secondary = "";
+        AudioClip sound = null;
 
         if (line == 10)
         {
+            currentViolentLine = 10;
             main = "10 unholy beasts slaughtered!";
             secondary = "Truth of suffering acknowledged";
+            sound = combatPopup10;
         }
         else if (line == 30)
         {
+            currentViolentLine = 30;
             main = "30 fell creatures returned to dust!";
             secondary = "Cause of suffering revealed";
+            sound = combatPopup30;
         }
         else if (line == 60)
         {
+            currentViolentLine = 60;
             main = "60 abhorrent monsters crushed!";
             secondary = "End to suffering in sight";
+            sound = combatPopup60;
         }
         else if (line == 100)
         {
+            currentViolentLine = 100;
             main = "100 wretched beings eviscerated!";
             secondary = "Path from suffering found";
+            sound = combatPopup100;
         }
 
         violent.SetActive(true);
@@ -127,19 +150,25 @@ public class PopupText : MonoBehaviour
         violentSecondary.text = "--- " + secondary + " ---";
         violentSecondaryDup.generate();
 
+        audio.clip = sound;
+        audio.volume = 1;
+        audio.Play();
+
         Invoke("hideViolent", (main.Length + secondary.Length) / 10f);
     }
 
     private void hideViolent()
     {
         violent.SetActive(false);
+        audio.Stop();
     }
 
     private void showPeaceful(PeacefulLines line)
     {
-        currentLine = line;
+        currentPeacefulLine = line;
 
         string main = "";
+        AudioClip sound = null;
 
         switch (line)
         {
@@ -148,23 +177,28 @@ public class PopupText : MonoBehaviour
                     "The dark whisperings that spring forth in idle minds, and take hold. " +
                     "Send them back, howling from whence they came! Call forth your vehemence, and stain your soul. " +
                     "In time you will wash them all away to amnesia.";
+                sound = prologuePopup;
                 break;
             case PeacefulLines.Sanctuary:
                 hasLeftSanctuary = false;
                 main = "Breathe deep, small one. You are safe. You are warm. " +
                     "The beasts cannot harm you here. Sit, sleep, and let forgetfulness take you.";
+                sound = sanctuaryPopup;
                 break;
             case PeacefulLines.Healing:
                 main = "Wash the blood from your wounds, and the pain from your mind. " +
                     "Let your sins flow away to afterthought.";
+                sound = healingPopup;
                 break;
             case PeacefulLines.Buying:
                 main = "My gift of sleep and your gift of death are not so different. " +
                     "Choose wisely, and bring swift justice to those horrid beasts.";
+                sound = buyingPopup;
                 break;
             case PeacefulLines.Exiting:
                 main = "Be well, small one. Dark horrors await you beyond my reach. " +
                     "As always, I will await your end.";
+                sound = exitingPopup;
                 break;
         }
 
@@ -173,11 +207,16 @@ public class PopupText : MonoBehaviour
         peacefulMain.text = main;
         peacefulMainDup.generate();
 
+        audio.clip = sound;
+        audio.volume = 1;
+        audio.Play();
+
         //Invoke("hidePeaceful", main.Length / 10f);
     }
 
     private void hidePeaceful()
     {
         peaceful.SetActive(false);
+        audio.Stop();
     }
 }
