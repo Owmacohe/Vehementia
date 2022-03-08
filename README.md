@@ -20,11 +20,40 @@
 
 ***Entry 1***
 
-- 
+- Focused mainly on player and enemy creation
+- Sprite animation and particle effects tweaking
+- Basic movement
+
+***Entry 2***
+
+- Added text effects and made them animated
+- Added tile maps, and procedural tile generation
+
+***Entry 3***
+
+- Added enemy movement
+- Lot of combat balancing and combat feel tweaks
+- Added music, enemy spawner, and wall of death
+
+***Entry 4***
+
+- More work on text popups
+- Started adding voice lines and sanctuary area
+
+***Entry 5***
+
+- Finished sanctuary and game loop
+- Added and integrated voices
+- Added prologue and helper UI
 
 ## Questions for playtesters
 
-1. 
+1. Is the game too jarring when transitioning between the “calm” and “violent” sections?
+1. Does the music transition well?
+1. How does the combat feel? Rewarding? Impactful?
+1. Is the game too difficult? (also curious what high score playtesters were able to get)
+1. Are the sound effects (e.g. monster sounds, voice lines) integrated well?
+1. Should the game have more narrative? Less?
 
 ## Results from playtesting
 
