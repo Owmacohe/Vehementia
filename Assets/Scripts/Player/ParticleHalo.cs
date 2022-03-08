@@ -22,6 +22,11 @@ public class ParticleHalo : MonoBehaviour
     {
         halo = GetComponentInChildren<ParticleSystem>();
         particleMain = halo.main;
+
+        if (FindObjectOfType<PopupText>().isPrologue)
+        {
+            setIdle();
+        }
     }
 
     private void FixedUpdate()

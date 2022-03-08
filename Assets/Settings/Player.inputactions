@@ -91,17 +91,6 @@
                 },
                 {
                     "name": "",
-                    "id": "d5436fbb-78a7-4072-b572-e3810fe10d9c",
-                    "path": "<Gamepad>/leftStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "df1b5b0f-960f-40d6-8143-c7ad7ad5e13f",
                     "path": "<Keyboard>/space",
                     "interactions": "",
@@ -129,17 +118,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "7fd19ddd-836c-4c02-9b96-708959ccb0f4",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false

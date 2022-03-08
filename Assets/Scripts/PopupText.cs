@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class PopupText : MonoBehaviour
 {
+    public bool isPrologue = false;
+    public GameObject hint, keeper;
+
     [Header("Violent")]
     public GameObject violent;
     public AudioClip combatPopup10, combatPopup30, combatPopup60, combatPopup100;
@@ -54,53 +57,74 @@ public class PopupText : MonoBehaviour
             loader = Instantiate(Resources.Load<GameObject>("Scene Manager"), Vector2.zero, Quaternion.identity).GetComponent<SceneLoader>();
         }
 
-        if (!loader.hasAlreadyPlayed)
+        if (isPrologue)
         {
             showPeaceful(PeacefulLines.Prologue);
         }
         else
         {
-            showPeaceful(PeacefulLines.Sanctuary);
+            if (loader.hasAlreadyPlayed)
+            {
+                showPeaceful(PeacefulLines.Sanctuary);
+                hint.transform.GetChild(0).gameObject.SetActive(false);
+            }
+            else
+            {
+                hint.transform.GetChild(1).gameObject.SetActive(false);
+                keeper.SetActive(false);
+            }
         }
     }
 
     private void Update()
     {
-        float pos = player.transform.position.x;
+        if (!isPrologue)
+        {
+            if (loader.hasAlreadyPlayed)
+            {
+                float pos = player.transform.position.x;
 
-        if (pos >= 0)
-        {
-            if (!hasLeftSanctuary)
-            {
-                hasLeftSanctuary = true;
-                hidePeaceful();
-            }
-        }
-        else if (pos >= -13 && pos < 0)
-        {
-            if (!hasLeftSanctuary && !currentPeacefulLine.Equals(PeacefulLines.Exiting))
-            {
-                showPeaceful(PeacefulLines.Exiting);
-            }
-        }
-        else
-        {
-            if (hasLeftSanctuary && !currentPeacefulLine.Equals(PeacefulLines.Sanctuary))
-            {
-                showPeaceful(PeacefulLines.Sanctuary);
-            }
-        }
+                if (pos >= 0)
+                {
+                    if (!hasLeftSanctuary)
+                    {
+                        hasLeftSanctuary = true;
+                        hidePeaceful();
+                    }
+                }
+                else if (pos >= -13 && pos < 0)
+                {
+                    if (!hasLeftSanctuary && !currentPeacefulLine.Equals(PeacefulLines.Exiting))
+                    {
+                        showPeaceful(PeacefulLines.Exiting);
+                        hint.transform.GetChild(0).gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    if (hasLeftSanctuary && !currentPeacefulLine.Equals(PeacefulLines.Sanctuary))
+                    {
+                        showPeaceful(PeacefulLines.Sanctuary);
+                    }
+                }
 
-        tryShowViolent(player.killCount);
+                if (player.hasForgotten)
+                {
+                    hint.transform.GetChild(1).gameObject.SetActive(false);
+                }
+            }
+
+            tryShowViolent(player.killCount);
+        }
     }
 
     private void tryShowViolent(int kills)
     {
         if (!popups.Contains(kills) && (
-            (kills >= 10 && kills < 30 && currentViolentLine < 10) ||
-            (kills >= 30 && kills < 60 && currentViolentLine < 30) ||
-            (kills >= 60 && kills < 100 && currentViolentLine < 60) ||
-            (kills >= 100 && currentViolentLine < 100)))
+            (kills >= 10 && kills < 30 && currentViolentLine != 10) ||
+            (kills >= 30 && kills < 60 && currentViolentLine != 30) ||
+            (kills >= 60 && kills < 100 && currentViolentLine != 60) ||
+            (kills >= 100 && currentViolentLine != 100)))
         {
             showViolent(kills);
             popups.Add(kills);
@@ -211,12 +235,20 @@ public class PopupText : MonoBehaviour
         audio.volume = 1;
         audio.Play();
 
-        //Invoke("hidePeaceful", main.Length / 10f);
+        if (isPrologue)
+        {
+            Invoke("hidePeaceful", main.Length / 12f);
+        }
     }
 
     private void hidePeaceful()
     {
         peaceful.SetActive(false);
         audio.Stop();
+
+        if (isPrologue)
+        {
+            loader.load("Main Scene");
+        }
     }
 }

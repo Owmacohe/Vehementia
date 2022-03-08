@@ -1128,7 +1128,7 @@ MonoBehaviour:
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 100
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -1674,6 +1674,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 064a7045e470ebd43843b0a3b5f7e7b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPrologue: 0
+  hint: {fileID: 0}
   violent: {fileID: 3579882468685812889}
   combatPopup10: {fileID: 8300000, guid: 2be29c8c2d0d477409636f2bbb83a833, type: 3}
   combatPopup30: {fileID: 8300000, guid: 960decddb0221844695f7d24fc579252, type: 3}
@@ -7041,6 +7043,7 @@ MonoBehaviour:
   isOnGround: 0
   isJumping: 0
   hasDied: 0
+  hasForgotten: 0
   killCount: 0
 --- !u!114 &8054377391513673868
 MonoBehaviour:

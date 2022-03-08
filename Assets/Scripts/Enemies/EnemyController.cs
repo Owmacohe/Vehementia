@@ -118,9 +118,9 @@ public class EnemyController : MonoBehaviour
 
             isJumping = true;
 
-            int soundChance = Random.Range(0, 1);
+            int soundChance = Random.Range(0, 3);
 
-            if (soundChance == 0)
+            if (soundChance <= 1)
             {
                 int specialChance = Random.Range(0, 6);
 

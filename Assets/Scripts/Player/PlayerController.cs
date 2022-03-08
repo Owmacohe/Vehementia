@@ -25,11 +25,12 @@ public class PlayerController : MonoBehaviour
     private ParticleHalo halo;
     private WeaponController weapon;
     private Camera playerCamera;
+    private SceneLoader loader;
 
     [HideInInspector]
     public float direction, moveCount;
     [HideInInspector]
-    public bool isOnGround, isJumping, hasDied;
+    public bool isOnGround, isJumping, hasDied, hasForgotten;
 
     [HideInInspector]
     public int killCount;
@@ -57,6 +58,21 @@ public class PlayerController : MonoBehaviour
 
         killCountDup = killCountMain.gameObject.GetComponent<TextDuplicator>();
         healthDup = healthMain.gameObject.GetComponent<TextDuplicator>();
+
+        loader = FindObjectOfType<SceneLoader>();
+
+        if (loader.hasAlreadyPlayed)
+        {
+            string temp = "Kill Count: " + "<shake a=" + (killCount / 50f) + ">" + killCount + "</shake>";
+
+            if (loader.hasAlreadyPlayed)
+            {
+                temp += "\nHigh Score: " + loader.highScore;
+            }
+
+            killCountMain.SetText(temp, false);
+            killCountDup.generate();
+        }
     }
 
     private void OnMove(InputValue input)
@@ -68,28 +84,60 @@ public class PlayerController : MonoBehaviour
     {
         if (!hasDied && isOnGround)
         {
-            rb.velocity += Vector2.up * jumpHeight;
+            if ((loader.hasAlreadyPlayed && hasForgotten) || !loader.hasAlreadyPlayed)
+            {
+                rb.velocity += Vector2.up * jumpHeight;
+            }
         }
     }
 
     private void OnInteract()
     {
-        weapon.swing();
+        if ((loader.hasAlreadyPlayed && hasForgotten) || !loader.hasAlreadyPlayed)
+        {
+            weapon.swing();
+        }
+        else
+        {
+            hasForgotten = true;
+            healthMain.SetText("Health: " + "<shake a=" + (1f / (health / 5f)) + ">" + health + "</shake>", false);
+            healthDup.generate();
+            healthDup.transform.parent.gameObject.SetActive(false);
+            halo.setWalking(100);
+        }
     }
 
     private void FixedUpdate()
     {
         if (transform.position.x < -12)
         {
-            playerCamera.enabled = false;
-            killCountDup.transform.parent.gameObject.SetActive(false);
-            healthDup.transform.parent.gameObject.SetActive(false);
+            if (playerCamera.enabled)
+            {
+                playerCamera.enabled = false;
+                killCountDup.transform.parent.gameObject.SetActive(false);
+
+                if (!loader.hasAlreadyPlayed)
+                {
+                    healthDup.transform.parent.gameObject.SetActive(false);
+                }
+                else
+                {
+                    if (!hasForgotten)
+                    {
+                        healthMain.SetText("Health: " + "<shake a=0.3>DEAD</shake>", false);
+                        healthDup.generate();
+                    }
+                }
+            }
         }
         else
         {
-            playerCamera.enabled = true;
-            killCountDup.transform.parent.gameObject.SetActive(true);
-            healthDup.transform.parent.gameObject.SetActive(true);
+            if (!playerCamera.enabled)
+            {
+                playerCamera.enabled = true;
+                killCountDup.transform.parent.gameObject.SetActive(true);
+                healthDup.transform.parent.gameObject.SetActive(true);
+            }
 
             if (!hasLeftSanctuary && transform.position.x >= 20)
             {
@@ -98,20 +146,32 @@ public class PlayerController : MonoBehaviour
                 Instantiate(Resources.Load("Wall Of Death"), Vector3.zero, Quaternion.identity);
                 GetComponent<EnemySpawner>().enabled = true;
             }
-        }
 
-        if (lastKillCount != killCount)
-        {
-            killCountMain.SetText( "Kill Count: " + "<shake a=" + (killCount / 50f) + ">" + killCount + "</shake>", false);
-            killCountDup.generate();
-            lastKillCount = killCount;
-        }
+            if (lastKillCount != killCount)
+            {
+                if (killCount > loader.highScore)
+                {
+                    loader.highScore = killCount;
+                }
 
-        if (lastHealth != health)
-        {
-            healthMain.SetText("Health: " + "<shake a=" + (1f / (health / 5f)) + ">" + health + "</shake>", false);
-            healthDup.generate();
-            lastHealth = health;
+                string temp = "Kill Count: " + "<shake a=" + (killCount / 50f) + ">" + killCount + "</shake>";
+
+                if (loader.hasAlreadyPlayed)
+                {
+                    temp += "\nHigh Score: " + loader.highScore;
+                }
+
+                killCountMain.SetText(temp, false);
+                killCountDup.generate();
+                lastKillCount = killCount;
+            }
+
+            if (lastHealth != health)
+            {
+                healthMain.SetText("Health: " + "<shake a=" + (1f / (health / 5f)) + ">" + health + "</shake>", false);
+                healthDup.generate();
+                lastHealth = health;
+            }
         }
 
         if (hasDied)
@@ -147,39 +207,50 @@ public class PlayerController : MonoBehaviour
                 anim.SetBool("isWalking", false);
                 Color temp = new Color(1, 1, 1, 0.2f * Mathf.Sin(0.5f * Time.time * Mathf.PI) + 0.5f);
                 rend.color = temp;
-                halo.setIdle();
+
+                if ((loader.hasAlreadyPlayed && transform.position.x >= -12) || (loader.hasAlreadyPlayed && !hasForgotten) || !loader.hasAlreadyPlayed)
+                {
+                    halo.setIdle();
+                }
 
                 weapon.gameObject.transform.localRotation = Quaternion.Euler(Vector3.forward * 30);
                 weaponRend.color = temp;
             }
             else
             {
-                rb.velocity = Vector2.up * rb.velocity.y;
-
-                if (transform.position.x >= 0)
+                if ((loader.hasAlreadyPlayed && hasForgotten) || !loader.hasAlreadyPlayed)
                 {
-                    moveCount += 0.2f;
-                }
+                    rb.velocity = Vector2.up * rb.velocity.y;
 
-                anim.SetBool("isWalking", true);
-                rend.color = Color.white;
-                halo.setWalking(moveCount);
-
-                weaponRend.color = Color.white;
-
-                transform.position += Vector3.right * direction * speed * 0.1f;
-
-                if (direction != 0)
-                {
-                    if (direction > 0)
+                    if (transform.position.x >= 0)
                     {
-                        transform.rotation = Quaternion.identity;
-                        playerCamera.transform.localRotation = Quaternion.identity;
+                        moveCount += 0.2f;
                     }
-                    else
+
+                    anim.SetBool("isWalking", true);
+                    rend.color = Color.white;
+
+                    if (transform.position.x >= -12)
                     {
-                        transform.rotation = Quaternion.Euler(Vector3.up * 180);
-                        playerCamera.transform.localRotation = Quaternion.Euler(Vector3.up * 180);
+                        halo.setWalking(moveCount);
+                    }
+
+                    weaponRend.color = Color.white;
+
+                    transform.position += Vector3.right * direction * speed * 0.1f;
+
+                    if (direction != 0)
+                    {
+                        if (direction > 0)
+                        {
+                            transform.rotation = Quaternion.identity;
+                            playerCamera.transform.localRotation = Quaternion.identity;
+                        }
+                        else
+                        {
+                            transform.rotation = Quaternion.Euler(Vector3.up * 180);
+                            playerCamera.transform.localRotation = Quaternion.Euler(Vector3.up * 180);
+                        }
                     }
                 }
             }
