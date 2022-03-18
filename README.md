@@ -58,7 +58,21 @@
 ## Results from playtesting
 
 ### Main issues
+- Transition between areas was a bit jarring, could be solved with a manual confirmation
+- Enemy health bars are not displayed, which made combat feel not as rewarding
+- No indication of player damage
+- Jumping is currently useless
+- Could definitely be made harder
 
 ### Main enjoyments
+- Music transitioning was very good
+- Voice lines were implemented well
+- Enemy knockback is satisfying
 
 ### Improvements to be made
+- More narrative should be added, but not necessarily all at once
+- Combat can be made to be much more diverse
+  - Different enemy types
+  - Different weapons
+  - Platforming?
+- More visual cues all around
